@@ -1,39 +1,29 @@
-import java.util.ArrayList;
-
 public class Cell {
     private int value;
     private boolean checked;
     private Position cellPosition;
 
     public class Position{
-        private int i;
-        private int j;
+        private int x;
+        private int y;
 
-        Position(int posI, int posJ){
-            i = posI;
-            j = posJ;
+        Position(int posX, int posY){
+            x = posX;
+            y = posY;
         }
 
-        public int getI(){
-            return this.i;
+        public int getX(){
+            return this.x;
         }
 
-        public int getJ(){
-            return this.j;
-        }
-
-        public ArrayList<Integer> toList(){
-            ArrayList<Integer> positionAsList = new ArrayList<>();
-            positionAsList.add(i);
-            positionAsList.add(j);
-
-            return positionAsList;
+        public int getY(){
+            return this.y;
         }
     }
 
-    Cell(int i, int j, int v){
+    Cell(int x, int y, int v){
 
-        this.cellPosition = new Position(i, j);
+        this.cellPosition = new Position(x, y);
         this.value = v;
 
         //We only check for cells wit 1, so we skip the 0 valued ones
@@ -44,8 +34,8 @@ public class Cell {
         }
     }
 
-    Cell(int i, int j){
-        this.cellPosition = new Position(i, j);
+    Cell(int x, int y){
+        this.cellPosition = new Position(x, y);
         this.value = 0;
 
         this.checked = true;
@@ -67,19 +57,4 @@ public class Cell {
         this.checked = true;
     }
 
-    @Override
-    public boolean equals(Object object){
-        boolean same = false;
-
-        if(object != null && object instanceof Cell){
-            same = (this.cellPosition.i == ((Cell) object).cellPosition.i) && (this.cellPosition.j == ((Cell) object).cellPosition.j);
-        }
-
-        return same;
-    }
-
-    @Override
-    public int hashCode(){
-        return this.value   ;
-    }
 }

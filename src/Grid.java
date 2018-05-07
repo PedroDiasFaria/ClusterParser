@@ -3,9 +3,11 @@ import com.google.gson.Gson;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 
-public class GridChunks {
+public class Grid {
 
     private final String filePath;
     private byte[][] cellsGrid;
@@ -19,7 +21,7 @@ public class GridChunks {
     private BufferedWriter bw;
     private PrintWriter out;
 
-    private PrintWriter writer;
+    private Duration duration = null;
 
     /**
      * Aux array to check adjacents in grid
@@ -34,7 +36,7 @@ public class GridChunks {
      *
      * @param filePath
      */
-    GridChunks(String filePath){
+    Grid(String filePath){
 
         this.filePath = filePath;
 
@@ -68,11 +70,15 @@ public class GridChunks {
             e.printStackTrace();
         }
 
+        Instant before = Instant.now();
         checkAdjacentsGrid();
+        Instant after = Instant.now();
+        this.duration = Duration.between(before, after);
 
         this.out.close();
 
-        System.out.println("count = " + getNrOfOnes() + " | clusters = " + getNrOfClusters());
+        System.out.println("time = " + duration.toMillis() + "ms");
+        System.out.println("ones count = " + getNrOfOnes() + " | clusters = " + getNrOfClusters());
     }
 
     /**
@@ -112,7 +118,6 @@ public class GridChunks {
                         printAdjacents(cellClusterTemp);
                         this.nrOfClusters++;
                     }
-                    nrOfOnes++;
                 }
             }
         }
@@ -127,6 +132,7 @@ public class GridChunks {
 
         checkCell(x, y);
         this.cellClusterTemp.add(new Cell(x, y, 1));
+        this.nrOfOnes++;
 
         for(int[] offset : OFFSET){
             if(isInsideGrid(x + offset[1], y + offset[0])) {
@@ -173,6 +179,18 @@ public class GridChunks {
 
     /**
      *
+     * @return
+     */
+    public Duration getDuration(){
+        return this.duration;
+    }
+
+    public String getFilePath(){
+        return this.filePath;
+    }
+
+    /**
+     *
      * @param x
      * @param y
      * @return
@@ -182,7 +200,7 @@ public class GridChunks {
     }
 
     /**
-     * 
+     *
      * @param x
      * @param y
      */
