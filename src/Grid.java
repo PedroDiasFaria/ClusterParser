@@ -13,7 +13,11 @@ public class Grid {
     private byte[][] cellsGrid;
     private byte[][] checkedCells;
 
+    /**
+     * Temporary list of adjacent cells
+     */
     private ArrayList<Cell> cellClusterTemp = null;
+    
     private int nrOfClusters = 0;
     private int nrOfOnes = 0;
 
@@ -33,8 +37,9 @@ public class Grid {
 
 
     /**
-     *
-     * @param filePath
+     * Class constructor thar sets up the solution file with all
+     * the lists of adjacent points
+     * @param filePath the file path to be parsed as a grid
      */
     Grid(String filePath){
 
@@ -58,10 +63,16 @@ public class Grid {
     }
 
     /**
-     *
+     * Main function of the class
+     * Reads all the values from the file to a 2D array of Bytes
+     * representing each cell of the grid
      */
     public void checkAdjacents(){
 
+        /**
+         * Gson - A Java serialization/deserialization library to convert Java Objects into JSON and back
+         * https://github.com/google/gson
+         */
         Gson gson = new Gson();
         try (BufferedReader reader = Files.newBufferedReader(Paths.get(filePath))) {
             this.cellsGrid = gson.fromJson(reader, byte[][].class);
@@ -73,8 +84,8 @@ public class Grid {
         Instant before = Instant.now();
         checkAdjacentsGrid();
         Instant after = Instant.now();
-        this.duration = Duration.between(before, after);
 
+        this.duration = Duration.between(before, after);
         this.out.close();
 
         System.out.println("time = " + duration.toMillis() + "ms");
@@ -82,7 +93,10 @@ public class Grid {
     }
 
     /**
-     *
+     * Creates a mirrored grid from the input one
+     * so we can track which cells we pass through during the computation
+     * 0 = unvisited
+     * 1 = visited
      */
     private void buildCheckedGrid() {
 
@@ -102,6 +116,8 @@ public class Grid {
     }
 
     /**
+     * Computing function that will create the list of cells in a cluster
+     * each time we pass through an unvisited cell with a value of 1
      *
      */
     private void checkAdjacentsGrid() {
@@ -111,11 +127,12 @@ public class Grid {
             for(int j = 0; j < this.cellsGrid[i].length; j++){
                 if((this.cellsGrid[i][j]== (byte) 1) && (this.checkedCells[i][j] == (byte) 0)){
                     cellClusterTemp = new ArrayList<>();
+
                     checkCellAdjacents(i, j);
 
                     /* Only counts as a cluster if there is at least two 1's adjacent */
                     if(cellClusterTemp.size() > 1){
-                        printAdjacents(cellClusterTemp);
+                        printAdjacents();
                         this.nrOfClusters++;
                     }
                 }
@@ -124,9 +141,10 @@ public class Grid {
     }
 
     /**
-     *
-     * @param x
-     * @param y
+     * Computing function that receives a cell and finds, checks
+     * and adds to a temporary list all its adjacent neighbours (non diagonally)
+     * @param x x position of the cell
+     * @param y y position of the cell
      */
     private void checkCellAdjacents(int x, int y) {
 
@@ -144,14 +162,16 @@ public class Grid {
     }
 
     /**
-     *
-     * @param adjacentList
+     * Prints every array of cells representing a cluster
+     * to the .solution file
+     * This function is called every time it is found
+     * all the cells of a cluster
      */
-    private void printAdjacents(ArrayList<Cell> adjacentList) {
+    private void printAdjacents() {
 
         boolean previous = false;
         this.out.print("[ ");
-        for (Cell cell : adjacentList) {
+        for (Cell cell : this.cellClusterTemp) {
             if(previous){
                 this.out.print(", ");
             }
@@ -163,7 +183,7 @@ public class Grid {
 
     /**
      *
-     * @return
+     * @return the number of clusters in the grid
      */
     public int getNrOfClusters(){
         return this.nrOfClusters;
@@ -171,7 +191,7 @@ public class Grid {
 
     /**
      *
-     * @return
+     * @return the number of cells with value 1 in the grid
      */
     public int getNrOfOnes(){
         return this.nrOfOnes;
@@ -179,30 +199,35 @@ public class Grid {
 
     /**
      *
-     * @return
+     * @return the duration of the adjacent lists computing
      */
     public Duration getDuration(){
         return this.duration;
     }
 
+    /**
+     *
+     * @return the path of the file representing the grid
+     */
     public String getFilePath(){
         return this.filePath;
     }
 
     /**
-     *
-     * @param x
-     * @param y
-     * @return
+     * Computing function that evaluates if a cell is inside the grid's boundaries
+     * @param x x position of the cell
+     * @param y y position of the cell
+     * @return true if the cell is inside the grid, false otherwise
      */
     private boolean isInsideGrid(int x, int y) {
         return (x < this.cellsGrid.length &&  x >= 0 && y < this.cellsGrid[x].length && y >= 0);
     }
 
     /**
-     *
-     * @param x
-     * @param y
+     * Marks the cell received as checked, so that future iterations
+     * do not process it again
+     * @param x x position of the cell
+     * @param y y position of the cell
      */
     private void checkCell(int x, int y){
         this.checkedCells[x][y] = 1;
