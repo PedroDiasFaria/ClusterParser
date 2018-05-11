@@ -1,6 +1,6 @@
 	Results from ./testFiles/20000x20000.json
 	---	---	---	---	---	---	---	---	---	---	---
-Time Elapsed = 60746 ms
+Time Elapsed = 68645 ms
 Number of Ones = 119999200
 Number of Clusters = 22450980
 
@@ -10,7 +10,7 @@ Number of Clusters = 22450980
 
 	Results from ./testFiles/100x100.json
 	---	---	---	---	---	---	---	---	---	---	---
-Time Elapsed = 3 ms
+Time Elapsed = 1 ms
 Number of Ones = 3004
 Number of Clusters = 586
 
@@ -20,7 +20,7 @@ Number of Clusters = 586
 
 	Results from ./testFiles/10000x10000.json
 	---	---	---	---	---	---	---	---	---	---	---
-Time Elapsed = 5532 ms
+Time Elapsed = 7964 ms
 Number of Ones = 29998767
 Number of Clusters = 5612372
 
@@ -30,7 +30,7 @@ Number of Clusters = 5612372
 
 	Results from ./testFiles/1000x1000.json
 	---	---	---	---	---	---	---	---	---	---	---
-Time Elapsed = 53 ms
+Time Elapsed = 45 ms
 Number of Ones = 299527
 Number of Clusters = 56053
 

@@ -11,13 +11,12 @@ public class Grid {
 
     private final String filePath;
     private byte[][] cellsGrid;
-    private byte[][] checkedCells;
 
     /**
      * Temporary list of adjacent cells
      */
     private ArrayList<Cell> cellClusterTemp = null;
-    
+
     private int nrOfClusters = 0;
     private int nrOfOnes = 0;
 
@@ -76,7 +75,6 @@ public class Grid {
         Gson gson = new Gson();
         try (BufferedReader reader = Files.newBufferedReader(Paths.get(filePath))) {
             this.cellsGrid = gson.fromJson(reader, byte[][].class);
-            buildCheckedGrid();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -93,29 +91,6 @@ public class Grid {
     }
 
     /**
-     * Creates a mirrored grid from the input one
-     * so we can track which cells we pass through during the computation
-     * 0 = unvisited
-     * 1 = visited
-     */
-    private void buildCheckedGrid() {
-
-        this.checkedCells = new byte[this.cellsGrid.length][];
-
-        for(int i = 0; i < this.cellsGrid.length; i++){
-            byte[] row = new byte[this.cellsGrid[i].length];
-            for(int j = 0; j < this.cellsGrid[i].length; j++){
-                if(this.cellsGrid[i][j]==1){
-                    row[j] = 0;
-                }else{
-                    row[j] = 1;
-                }
-            }
-            this.checkedCells[i] = row;
-        }
-    }
-
-    /**
      * Computing function that will create the list of cells in a cluster
      * each time we pass through an unvisited cell with a value of 1
      *
@@ -123,9 +98,8 @@ public class Grid {
     private void checkAdjacentsGrid() {
 
         for(int i = 0; i < this.cellsGrid.length; i++){
-            System.out.println(((float) i/this.cellsGrid.length*100) + "% complete." + "Processing row:" + i);
             for(int j = 0; j < this.cellsGrid[i].length; j++){
-                if((this.cellsGrid[i][j]== (byte) 1) && (this.checkedCells[i][j] == (byte) 0)){
+                if(this.cellsGrid[i][j]== (byte) 1){
                     cellClusterTemp = new ArrayList<>();
 
                     checkCellAdjacents(i, j);
@@ -154,7 +128,7 @@ public class Grid {
 
         for(int[] offset : OFFSET){
             if(isInsideGrid(x + offset[1], y + offset[0])) {
-                if (this.checkedCells[x+offset[1]][y+offset[0]] == (byte) 0){
+                if (this.cellsGrid[x+offset[1]][y+offset[0]] == (byte) 1){
                     checkCellAdjacents(x + offset[1], y + offset[0]);
                 }
             }
@@ -225,11 +199,12 @@ public class Grid {
 
     /**
      * Marks the cell received as checked, so that future iterations
-     * do not process it again
+     * do not process it again.
+     * A cell is checked if its already a 0
      * @param x x position of the cell
      * @param y y position of the cell
      */
     private void checkCell(int x, int y){
-        this.checkedCells[x][y] = 1;
+        this.cellsGrid[x][y] = 0;
     }
 }
