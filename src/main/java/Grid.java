@@ -2,6 +2,7 @@ import com.google.gson.Gson;
 
 import java.io.*;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
 import java.time.Instant;
@@ -9,7 +10,8 @@ import java.util.ArrayList;
 
 public class Grid {
 
-    private final String filePath;
+    private final Path filePath;
+    private final Path solutionPath =  Paths.get(System.getProperty("user.dir"), "solutionFiles");
     private byte[][] cellsGrid;
 
     /**
@@ -40,20 +42,22 @@ public class Grid {
      * the lists of adjacent points
      * @param filePath the file path to be parsed as a grid
      */
-    Grid(String filePath){
+    Grid(Path filePath){
 
         this.filePath = filePath;
 
-        String solutionPath = filePath+".solution";
 
+        Path solutionPath = Paths.get(this.solutionPath.toString(), filePath.getFileName().toString()+".solution");
         try{
-            File file = new File(solutionPath);
+            File file = solutionPath.toFile();//new File(solutionPath.toString());
             if(file.exists()){
                 file.delete();
+            }else{
+                file.getParentFile().mkdirs();
+                file.createNewFile();
             }
-            file.createNewFile();
 
-            this.fw = new FileWriter(solutionPath, true);
+            this.fw = new FileWriter(solutionPath.toString(), true);
             this.bw = new BufferedWriter(fw);
             this.out = new PrintWriter(bw);
         }catch (IOException e){
@@ -73,7 +77,7 @@ public class Grid {
          * https://github.com/google/gson
          */
         Gson gson = new Gson();
-        try (BufferedReader reader = Files.newBufferedReader(Paths.get(filePath))) {
+        try (BufferedReader reader = Files.newBufferedReader(filePath)) {
             this.cellsGrid = gson.fromJson(reader, byte[][].class);
         } catch (IOException e) {
             e.printStackTrace();
@@ -86,8 +90,11 @@ public class Grid {
         this.duration = Duration.between(before, after);
         this.out.close();
 
+        System.out.println("-----------------------------------------------");
+        System.out.println("File: " + getFileName());
         System.out.println("time = " + duration.toMillis() + "ms");
         System.out.println("ones count = " + getNrOfOnes() + " | clusters = " + getNrOfClusters());
+        System.out.println("-----------------------------------------------\n");
     }
 
     /**
@@ -181,10 +188,10 @@ public class Grid {
 
     /**
      *
-     * @return the path of the file representing the grid
+     * @return the name of the file representing the grid
      */
-    public String getFilePath(){
-        return this.filePath;
+    public String getFileName(){
+        return this.filePath.getFileName().toString();
     }
 
     /**
